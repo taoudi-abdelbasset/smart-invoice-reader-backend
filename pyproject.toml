@@ -1,0 +1,28 @@
+[project]
+name = "smart-invoice-reader-backend"
+version = "0.1.0"
+description = "smart agent invoice reader"
+authors = [
+    {name = "abdelbasset.taoudi@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12,<4.0"
+dependencies = [
+    "fastapi (>=0.162.0,<0.163.0)",
+    "google-genai (>=2.34.0,<3.0.0)",
+    "mcp (>=2.3.0,<3.0.0)",
+    "agno (>=3.1.12,<4.0.0)"
+]
+
+[dependency-groups]
+dev = [
+    "agno (>=3.1.12,<4.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+package-mode = false
