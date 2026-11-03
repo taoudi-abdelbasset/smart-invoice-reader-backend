@@ -12,3 +12,5 @@ DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./app.db")
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 
+UPLOAD_DIR = "uploads"
+

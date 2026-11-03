@@ -22,7 +22,7 @@ def app_health():
 from app.models import user as user_model  # noqa: F401
 from app.models import conversation as conversation_model  # noqa: F401
 from app.models import file as file_model  # noqa: F401
-from app.routers import user, files, conversation
+from app.routers import files, user, conversation
 from app.auth import auth
 
 Base.metadata.create_all(bind=engine)

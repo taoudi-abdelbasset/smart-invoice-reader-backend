@@ -5,6 +5,8 @@ from sqlalchemy.sql import func
 from app.models.conversation import Conversation
 from app.schemas.conversation import ConversationCreate, ConversationUpdate
 
+from app.models.file import File
+
 
 def create_conversation(db: Session, user_id: UUID, data: ConversationCreate):
     conversation = Conversation(user_id=user_id, title=data.title)
@@ -46,3 +48,9 @@ def update_conversation(db: Session, conversation: Conversation, data: Conversat
 def delete_conversation(db: Session, conversation: Conversation):
     conversation.deleted_at = func.now()  # soft delete
     db.commit()
+
+def append_file(db: Session, conversation: Conversation, file: File) -> File:
+    conversation.files.append(file)
+    db.commit()
+    db.refresh(file)
+    return file
