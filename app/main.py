@@ -1,9 +1,7 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from agno.agent import Agent
-from agno.models.google import Gemini
-from app.core.config import DEFAULT_MODEL, ALLOW_ORIGINS
+from app.core.config import ALLOW_ORIGINS
 
 from app.db.database import Base, engine
 
@@ -22,10 +20,14 @@ def app_health():
     return {"success":True}
 
 from app.models import user as user_model  # noqa: F401
-from app.routers import user
+from app.models import conversation as conversation_model  # noqa: F401
+from app.models import file as file_model  # noqa: F401
+from app.routers import user, files, conversation
 from app.auth import auth
 
 Base.metadata.create_all(bind=engine)
 
 app.include_router(user.router)
 app.include_router(auth.router) 
+app.include_router(files.router)
+app.include_router(conversation.router)
