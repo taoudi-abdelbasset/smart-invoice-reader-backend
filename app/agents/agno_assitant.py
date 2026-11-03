@@ -4,6 +4,10 @@ from app.core.config import DEFAULT_MODEL
 from agno.tools.reasoning import ReasoningTools
 from app.agents.storage import agent_storage
 
+from agno.memory.v2.db.sqlite import SqliteMemoryDb
+from agno.memory.v2.memory import Memory
+from app.db.database import engine
+
 
 def get_agent(
     model_id: str = DEFAULT_MODEL,
@@ -11,6 +15,12 @@ def get_agent(
     session_id: str = None,
     debug_mode = True,
 ) -> Agent:
+    agent_memory = Memory(
+        db=SqliteMemoryDb(table_name="memory", db_engine=engine),
+        model=Gemini(
+            id=model_id,
+        ),
+    )
     return Agent(
         name="Invoice Assist",
         agent_id="invoice_assist",
@@ -57,6 +67,9 @@ def get_agent(
 
         add_history_to_messages=True,
         storage=agent_storage,
+
+        enable_agentic_memory=True,
+        memory=agent_memory,
     )
 
 
