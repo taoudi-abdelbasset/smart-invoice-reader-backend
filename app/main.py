@@ -22,7 +22,8 @@ def app_health():
 from app.models import user as user_model  # noqa: F401
 from app.models import conversation as conversation_model  # noqa: F401
 from app.models import file as file_model  # noqa: F401
-from app.routers import files, user, conversation
+from app.models import message as message_model  # noqa: F401
+from app.routers import files, user, conversation, message
 from app.auth import auth
 
 Base.metadata.create_all(bind=engine)
@@ -31,3 +32,4 @@ app.include_router(user.router)
 app.include_router(auth.router) 
 app.include_router(files.router)
 app.include_router(conversation.router)
+app.include_router(message.router)

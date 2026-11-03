@@ -2,6 +2,7 @@ from pydantic import BaseModel, ConfigDict
 from uuid import UUID
 from datetime import datetime
 from app.schemas.user import UserOut
+from app.schemas.message import MessageBody
 
 class UploadedMiniFile(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -20,6 +21,7 @@ class ConversationOut(BaseModel):
     created_at: datetime
     user: UserOut
     files: list[UploadedMiniFile]
+    messages: list[MessageBody]
 
 class ConversationCreate(BaseModel):
     title: str

@@ -17,3 +17,4 @@ class Conversation(Base):
 
     user = relationship("User", back_populates="conversations")
     files = relationship("File", back_populates="conversation")
+    messages = relationship("Message", back_populates="conversation")
