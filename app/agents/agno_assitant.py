@@ -2,11 +2,7 @@ from agno.agent import Agent
 from agno.models.google import Gemini
 from app.core.config import DEFAULT_MODEL
 from agno.tools.reasoning import ReasoningTools
-from app.agents.storage import agent_storage
-
-from agno.memory.v2.db.sqlite import SqliteMemoryDb
-from agno.memory.v2.memory import Memory
-from app.db.database import engine
+from app.agents.storage import agent_db
 
 
 def get_agent(
@@ -15,15 +11,9 @@ def get_agent(
     session_id: str = None,
     debug_mode = True,
 ) -> Agent:
-    agent_memory = Memory(
-        db=SqliteMemoryDb(table_name="memory", db_engine=engine),
-        model=Gemini(
-            id=model_id,
-        ),
-    )
     return Agent(
         name="Invoice Assist",
-        agent_id="invoice_assist",
+        id="invoice_assist",
         user_id=user_id,
         session_id=session_id,
         model=Gemini(
@@ -58,18 +48,15 @@ def get_agent(
             "Do not make up data and do not save unconfirmed data.",
         ],
         markdown=True,
-        add_datetime_to_instructions=True,
-        
+        add_datetime_to_context=True,
         debug_mode=debug_mode,
 
         # for reasononing tool
         read_chat_history=True,
 
-        add_history_to_messages=True,
-        storage=agent_storage,
-
-        enable_agentic_memory=True,
-        memory=agent_memory,
+        db=agent_db,
+        add_history_to_context=True,
+        num_history_runs=3,
     )
 
 

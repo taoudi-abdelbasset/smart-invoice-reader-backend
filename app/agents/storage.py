@@ -1,4 +1,4 @@
-from agno.storage.sqlite import SqliteStorage
+from agno.db.sqlite import SqliteDb
 from app.db.database import engine
 
-agent_storage = SqliteStorage(table_name="agent_sessions", db_engine=engine)
+agent_db = SqliteDb(db_engine=engine, session_table="agent_sessions")

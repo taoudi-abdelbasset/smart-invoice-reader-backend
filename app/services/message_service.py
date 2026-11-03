@@ -5,8 +5,8 @@ from app.models.message import Message
 from app.schemas.message import SendMessage, MessageRole
 
 
-def create_message(db: Session, conversation_id: UUID, data: SendMessage):
-    message = Message(conversation_id=conversation_id, content=data.content, role=MessageRole.user)
+def create_message(db: Session, conversation_id: UUID, content: str, role: MessageRole = MessageRole.user):
+    message = Message(conversation_id=conversation_id, content=content, role=role)
     db.add(message)
     db.commit()
     db.refresh(message)
