@@ -12,3 +12,6 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     conversations = relationship("Conversation", back_populates="user")
+    invoices = relationship("Invoice", back_populates="user")
+    business_entities = relationship("BusinessEntity", back_populates="user")
+    companies = relationship("Invoice", back_populates="user")

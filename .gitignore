@@ -224,3 +224,4 @@ __marimo__/
 
 app.db
 uploads
+*/*-example.py

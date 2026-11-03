@@ -19,3 +19,4 @@ class File(Base):
     deleted_at= Column(DateTime(timezone=True))
 
     conversation = relationship("Conversation", back_populates="files")
+    invoice = relationship("Invoice", back_populates="file", uselist=False)
