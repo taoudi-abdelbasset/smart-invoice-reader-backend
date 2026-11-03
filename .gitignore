@@ -221,3 +221,6 @@ __marimo__/
 
 .tmp
 .TODO.md
+
+app.db
+uploads

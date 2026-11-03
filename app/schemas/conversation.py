@@ -7,6 +7,7 @@ class UploadedMiniFile(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: UUID
     file_name: str
+    is_proccesed: bool
     conversation_id: UUID
     created_at: datetime
 

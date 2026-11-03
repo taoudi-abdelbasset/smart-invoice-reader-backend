@@ -1,6 +1,6 @@
 import uuid
 from app.db.database import Base
-from sqlalchemy import Column, Uuid, String, DateTime, ForeignKey
+from sqlalchemy import Column, Uuid, String, DateTime, ForeignKey,Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -11,6 +11,9 @@ class File(Base):
 
     file_name = Column(String)
     file_path = Column(String)
+
+    # Add procesed feild so the model know what new receite to process  
+    is_proccesed = Column(Boolean, default=False)
 
     created_at= Column(DateTime(timezone=True), server_default=func.now())
     deleted_at= Column(DateTime(timezone=True))
