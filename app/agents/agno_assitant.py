@@ -3,9 +3,14 @@ from agno.models.google import Gemini
 from app.core.config import DEFAULT_MODEL
 from agno.tools.reasoning import ReasoningTools
 from app.agents.storage import agent_db
-
+from app.agents.custom_tools import InvoiceTools
+from uuid import UUID
+from sqlalchemy.orm import Session
+from fastapi import Depends
+from app.dependencies import get_db
 
 def get_agent(
+    db: Session = Depends(get_db),
     model_id: str = DEFAULT_MODEL,
     user_id: str = None,
     session_id: str = None,
@@ -20,7 +25,12 @@ def get_agent(
             id=model_id,
         ),
         tools=[
-            ReasoningTools(add_instructions=True)
+            ReasoningTools(add_instructions=True),
+            InvoiceTools(
+                db=db,
+                user_id=UUID(user_id),
+                session_id=UUID(session_id),
+            ),
         ],
         description = (
             "You are Smart Invoice Assist, an AI agent that extracts data from invoice files (images and PDFs), saves it in a structured database, and helps the user organize, search, and report on their invoices."
@@ -30,7 +40,7 @@ def get_agent(
             "Your current task is to extract data from uploaded invoice files (image or PDF) and save it to the database.",
 
             # Extraction
-            "Read the invoice carefully and extract these fields: invoice_number, invoice_date, due_date, vendor_name, vendor_address, vendor_tax_id, customer_name, currency, subtotal, tax_amount, total_amount, payment_method, and line_items.",
+            "Read the invoice carefully and extract these fields: invoice_number, invoice_date, due_date, vendor_name, vendor_address, customer_name, currency, subtotal, tax_amount, total_amount, payment_method, and line_items.",
             "For each line item extract: description, quantity, unit_price, total.",
             "Dates must be in ISO format (YYYY-MM-DD). Amounts must be plain numbers with no currency symbols or thousands separators. Currency must be an ISO code (MAD, EUR, USD...).",
             "If a field is missing or unreadable, set it to null. Never guess or invent values.",

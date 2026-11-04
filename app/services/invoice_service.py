@@ -1,5 +1,4 @@
 from datetime import datetime
-from decimal import Decimal
 from uuid import UUID
 
 from fastapi import HTTPException, status
@@ -15,6 +14,53 @@ from app.models.invoice_item import InvoiceItem
 from app.schemas.invoice import InvoiceCreate
 from sqlalchemy.orm import contains_eager
 
+from sqlalchemy import func
+from app.models.contact import CompanyContact, EntityContact, ContactType
+from app.schemas.invoice_tool import BusinessEntityInput
+
+
+def _add_missing_contacts(parent, contact_cls, contacts):
+    existing = {(c.type, c.value.lower()) for c in parent.contacts if c.deleted_at is None}
+    for c in contacts:
+        if (ContactType(c.type), c.value.lower()) not in existing:
+            parent.contacts.append(contact_cls(type=ContactType(c.type), value=c.value, country=c.country))
+
+
+def get_or_create_party(db: Session, user_id: UUID, party: BusinessEntityInput) -> tuple[UUID | None, UUID | None]:
+    """Returns (company_id, entity_id); exactly one is set."""
+    if party.kind == "company":
+        if not party.name:
+            return None, None
+        obj = (
+            db.query(Company)
+            .filter(Company.user_id == user_id, Company.deleted_at.is_(None),
+                    func.lower(Company.name) == party.name.strip().lower())
+            .first()
+        )
+        if not obj:
+            obj = Company(user_id=user_id, name=party.name.strip(), address=party.address,
+                          country=party.country)
+            db.add(obj)
+        _add_missing_contacts(obj, CompanyContact, party.contacts)
+        db.flush()
+        return obj.id, None
+
+    if not (party.first_name or party.last_name):
+        return None, None
+    obj = (
+        db.query(BusinessEntity)
+        .filter(BusinessEntity.user_id == user_id, BusinessEntity.deleted_at.is_(None),
+                func.lower(BusinessEntity.first_name) == (party.first_name or "").lower(),
+                func.lower(BusinessEntity.last_name) == (party.last_name or "").lower())
+        .first()
+    )
+    if not obj:
+        obj = BusinessEntity(user_id=user_id, first_name=party.first_name, last_name=party.last_name,
+                             address=party.address, country=party.country)
+        db.add(obj)
+    _add_missing_contacts(obj, EntityContact, party.contacts)
+    db.flush()
+    return None, obj.id
 
 def _load_options():
     return [
@@ -27,8 +73,19 @@ def _load_options():
     ]
 
 
-def create_invoice(db: Session, user_id: UUID, file_id: UUID, data: InvoiceCreate):
-    file = db.query(File).get(file_id)
+def create_invoice(db: Session, user_id: UUID, session_id: UUID, file_id: UUID, data: InvoiceCreate):
+    file = (
+        db.query(File)
+        .join(Conversation, File.conversation_id == Conversation.session_id)
+        .filter(
+            File.id == file_id,
+            File.conversation_id == session_id,
+            Conversation.user_id == user_id,
+            File.deleted_at.is_(None),
+            File.is_proccesed.is_(False),
+        )
+        .first()
+    )
     if not file:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "File not found")
 
@@ -122,8 +179,8 @@ def search_invoices(
     vendor: str | None = None,
     date_from: datetime | None = None,
     date_to: datetime | None = None,
-    min_total: Decimal | None = None,
-    max_total: Decimal | None = None,
+    min_total: float | None = None,
+    max_total: float | None = None,
     limit: int = 50,
     offset: int = 0,
 ):

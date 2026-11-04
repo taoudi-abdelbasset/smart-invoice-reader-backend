@@ -14,3 +14,8 @@ ALGORITHM = os.getenv("ALGORITHM")
 
 UPLOAD_DIR = "uploads"
 
+ALLOWED_IMAGE_TYPES = {
+    "image/jpeg": ".jpg",
+    "image/png": ".png",
+}
+

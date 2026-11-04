@@ -11,7 +11,7 @@ router = APIRouter(prefix="/files", tags=["files"])
 
 
 @router.post("/upload", response_model=UploadedFile, status_code=status.HTTP_201_CREATED)
-def upload_new_file(
+async def upload_new_file(
     conversation_id: UUID = Form(...),
     upload: UploadFile = FormFile(...),
     user_id: UUID = Depends(auth_serivce.current_user_id),
@@ -22,4 +22,4 @@ def upload_new_file(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found")
 
     file = file_service.save_file(upload, user_id, conversation_id)
-    return conversation_service.append_file(db, conversation, file)
+    return await conversation_service.append_file(db, conversation, file)
