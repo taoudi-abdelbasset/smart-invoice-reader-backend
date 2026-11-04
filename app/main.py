@@ -28,7 +28,7 @@ from app.models import invoice_item as invoice_item_model  # noqa: F401
 from app.models import company as company_model  # noqa: F401
 from app.models import business_entity as business_entity_model  # noqa: F401
 from app.models import contact as contact_model  # noqa: F401
-from app.routers import files, user, conversation, message
+from app.routers import files, user, conversation, message, invoice
 from app.auth import auth
 
 Base.metadata.create_all(bind=engine)
@@ -38,3 +38,4 @@ app.include_router(auth.router)
 app.include_router(files.router)
 app.include_router(conversation.router)
 app.include_router(message.router)
+app.include_router(invoice.router)
