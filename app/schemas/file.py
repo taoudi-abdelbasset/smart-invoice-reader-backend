@@ -21,3 +21,10 @@ class UploadedFile(BaseModel):
     conversation_id: UUID
     conversation: ConversationMiniBody
     created_at: datetime
+
+class UploadedMiniFile(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: UUID
+    file_name: str
+    conversation_id: UUID
+    created_at: datetime

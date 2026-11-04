@@ -13,5 +13,6 @@ class User(Base):
 
     conversations = relationship("Conversation", back_populates="user")
     invoices = relationship("Invoice", back_populates="user")
+    
     business_entities = relationship("BusinessEntity", back_populates="user")
-    companies = relationship("Invoice", back_populates="user")
+    companies = relationship("Company", back_populates="user")

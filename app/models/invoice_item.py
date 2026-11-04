@@ -1,6 +1,6 @@
 import uuid
 from app.db.database import Base
-from sqlalchemy import Column, Uuid, String, DateTime, ForeignKey, Integer
+from sqlalchemy import Column, Uuid, String, DateTime, ForeignKey, Integer, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -13,9 +13,9 @@ class InvoiceItem(Base):
     index = Column(Integer, nullable=True)
     item_name = Column(String)
 
-    qte = Column(Integer, default=1)
-    unit_price = Column(Integer,default=0)
-    tax_rate = Column(Integer,default=0)
+    qte = Column(Float, default=1)
+    unit_price = Column(Float,default=0)
+    tax_rate = Column(Float,default=0)
 
 
     created_at= Column(DateTime(timezone=True), server_default=func.now())

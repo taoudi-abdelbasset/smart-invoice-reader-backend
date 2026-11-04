@@ -1,7 +1,7 @@
 import uuid
 from enum import Enum as EnumClass
 from app.db.database import Base
-from sqlalchemy import Column, Uuid, String, DateTime, ForeignKey, Integer
+from sqlalchemy import Column, Uuid, String, DateTime, ForeignKey, Float
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -20,9 +20,9 @@ class Invoice(Base):
 
     note = Column(String, nullable=True)
     currency = Column(String(3))
-    subtotal = Column(Integer)
-    tax_amount = Column(Integer)
-    total_amount = Column(Integer)
+    subtotal = Column(Float)
+    tax_amount = Column(Float)
+    total_amount = Column(Float)
     payment_method = Column(String, nullable=True)
     
     items = relationship("InvoiceItem", back_populates="invoice")

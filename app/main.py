@@ -23,6 +23,11 @@ from app.models import user as user_model  # noqa: F401
 from app.models import conversation as conversation_model  # noqa: F401
 from app.models import file as file_model  # noqa: F401
 from app.models import message as message_model  # noqa: F401
+from app.models import invoice as invoice_model  # noqa: F401
+from app.models import invoice_item as invoice_item_model  # noqa: F401
+from app.models import company as company_model  # noqa: F401
+from app.models import business_entity as business_entity_model  # noqa: F401
+from app.models import contact as contact_model  # noqa: F401
 from app.routers import files, user, conversation, message
 from app.auth import auth
 
