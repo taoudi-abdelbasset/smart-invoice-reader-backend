@@ -37,3 +37,8 @@ async def get_current_user(token: Annotated[str,Depends(oauth2_bearer)]):
         }
     except JWTError:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='somthing went wrong')
+
+async def current_user_id(user: dict = Depends(get_current_user)):
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user")
+    return UUID(str(user["id"]))

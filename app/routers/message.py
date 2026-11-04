@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.dependencies import get_db
 from app.schemas.message import SendMessage, MessageBody, MessageRole
 from app.services import message_service,conversation_service
-from app.routers.conversation import current_user_id
+from app.services import auth_serivce
 
 from app.agents.agno_assitant import get_agent
 
@@ -12,7 +12,7 @@ router = APIRouter(prefix="/messages", tags=["messages"])
 
 def get_owned_conversation(
     session_id: UUID,
-    user_id: UUID = Depends(current_user_id),
+    user_id: UUID = Depends(auth_serivce.current_user_id),
     db: Session = Depends(get_db),
 ):
     conversation = conversation_service.get_conversation(db, session_id, user_id)
@@ -24,7 +24,7 @@ def get_owned_conversation(
 async def create_message(
     new_message: SendMessage,
     conversation=Depends(get_owned_conversation),
-    user_id: UUID = Depends(current_user_id),
+    user_id: UUID = Depends(auth_serivce.current_user_id),
     db: Session = Depends(get_db),
 ):
     message_service.create_message(db, conversation.session_id, new_message.content, MessageRole.user)

@@ -9,15 +9,9 @@ from app.services import auth_serivce, conversation_service
 router = APIRouter(prefix="/conversations", tags=["conversations"])
 
 
-def current_user_id(user: dict = Depends(auth_serivce.get_current_user)):
-    if user is None:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate user")
-    return UUID(str(user["id"]))
-
-
 def get_owned_conversation(
     session_id: UUID,
-    user_id: UUID = Depends(current_user_id),
+    user_id: UUID = Depends(auth_serivce.current_user_id),
     db: Session = Depends(get_db),
 ):
     conversation = conversation_service.get_conversation(db, session_id, user_id)
@@ -29,7 +23,7 @@ def get_owned_conversation(
 @router.post("/", response_model=ConversationOut, status_code=status.HTTP_201_CREATED)
 def create_conversation(
     data: ConversationCreate,
-    user_id: UUID = Depends(current_user_id),
+    user_id: UUID = Depends(auth_serivce.current_user_id),
     db: Session = Depends(get_db),
 ):
     return conversation_service.create_conversation(db, user_id, data)
@@ -37,7 +31,7 @@ def create_conversation(
 
 @router.get("/", response_model=list[ConversationOut])
 def list_conversations(
-    user_id: UUID = Depends(current_user_id),
+    user_id: UUID = Depends(auth_serivce.current_user_id),
     db: Session = Depends(get_db),
 ):
     return conversation_service.list_conversations(db, user_id)

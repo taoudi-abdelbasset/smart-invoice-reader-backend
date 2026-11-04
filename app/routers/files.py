@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, File as FormFile, Form, HTTPException, U
 from sqlalchemy.orm import Session
 
 from app.dependencies import get_db
-from app.routers.conversation import current_user_id
+from app.services import auth_serivce
 from app.schemas.file import UploadedFile
 from app.services import conversation_service, file_service
 
@@ -14,7 +14,7 @@ router = APIRouter(prefix="/files", tags=["files"])
 def upload_new_file(
     conversation_id: UUID = Form(...),
     upload: UploadFile = FormFile(...),
-    user_id: UUID = Depends(current_user_id),
+    user_id: UUID = Depends(auth_serivce.current_user_id),
     db: Session = Depends(get_db),
 ):
     conversation = conversation_service.get_conversation(db, conversation_id, user_id)
