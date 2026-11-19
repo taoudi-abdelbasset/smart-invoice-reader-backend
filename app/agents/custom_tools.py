@@ -1,6 +1,7 @@
 import json
 from typing import List
-from agno.tools import Toolkit
+# from agno.tools import Toolkit
+from app.agents.tool_registry import RegisteredToolkit
 from agno.utils.log import logger
 from app.services import invoice_service
 from sqlalchemy.orm import Session
@@ -11,6 +12,7 @@ from datetime import datetime, timedelta
 from app.models.file import File
 from app.schemas.invoice import InvoiceCreate, InvoiceItemCreate
 from app.schemas.invoice_tool import BusinessEntityInput, InvoiceItemInput
+from app.services import file_service
 
 def _parse_date(value: str) -> datetime | None:
     """Tool input: 'YYYY-MM-DD' string -> datetime (None if empty)."""
@@ -35,7 +37,12 @@ def _summary(i: Invoice) -> dict:
 def _to_json(invoices: list[Invoice]) -> str:
     return json.dumps([_summary(i) for i in invoices])
 
-class InvoiceTools(Toolkit):
+class InvoiceTools(
+    RegisteredToolkit,
+    key="invoice_tools",
+    name="Invoice tools",
+    desc="List, search and save invoices extracted from uploaded files.",
+):
     def __init__(self, db: Session, user_id: UUID, session_id: UUID, **kwargs):
         self.db = db
         self.user_id = user_id
@@ -47,6 +54,7 @@ class InvoiceTools(Toolkit):
                 self.search_my_invoices,
                 self.list_my_session_invoice,
                 self.save_invoice,
+                self.list_unprocessed_files,
 
             ],
             **kwargs,
@@ -83,8 +91,8 @@ class InvoiceTools(Toolkit):
         Leave a filter empty to ignore it.
 
         Args:
-            query: Text to match inside the invoice number (partial match, case-insensitive).
-            vendor: Text to match in the vendor (issuer company) name (partial match, case-insensitive).
+            query: String to match inside the invoice number (partial match, case-insensitive).
+            vendor: String to match in the vendor (issuer company) name (partial match, case-insensitive).
             date_from: Earliest invoice date, inclusive, format YYYY-MM-DD.
             date_to: Latest invoice date, inclusive, format YYYY-MM-DD.
             min_total: Minimum total_amount, inclusive.
@@ -103,8 +111,8 @@ class InvoiceTools(Toolkit):
             end += timedelta(days=1) - timedelta(microseconds=1)
 
         invoices = invoice_service.search_invoices(
-            self.db,
-            self.user_id,
+            db=self.db,
+            user_id=self.user_id,
             q=query or None,
             vendor=vendor or None,
             date_from=start,
@@ -186,4 +194,29 @@ class InvoiceTools(Toolkit):
             return json.dumps({"error": e.detail})
         except ValueError as e:
             self.db.rollback()
+            return json.dumps({"error": str(e)})
+
+    def list_unprocessed_files(
+        self,
+        session_id: str | None = None,
+    )-> str:
+        """
+        List the Unprocessed files of the conversation. Call it once per request, only after
+        the user confirmed the extracted data. Leave unknown fields empty or null, never guess.
+
+        Args:
+            session_id: Is the ID of the current conversation
+
+        Returns:
+            JSON with the saved invoice id, or an error message.
+        """
+        try:
+            files_list = file_service.get_unproccessed_files(
+                self.db,
+                self.session_id,
+            )
+            return json.dumps(files_list)
+        except HTTPException as e:
+            return json.dumps({"error": e.detail})
+        except ValueError as e:
             return json.dumps({"error": str(e)})
