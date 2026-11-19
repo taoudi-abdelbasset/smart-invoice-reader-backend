@@ -29,7 +29,7 @@ async def create_message(
 ):
     message_service.create_message(db, conversation.session_id, new_message.content, MessageRole.user)
 
-    agent = get_agent(user_id=str(user_id), session_id=str(conversation.session_id))
+    agent = get_agent(db=db, user_id=str(user_id), session_id=str(conversation.session_id))
     try:
         response = await agent.arun(new_message.content)
     except Exception:
