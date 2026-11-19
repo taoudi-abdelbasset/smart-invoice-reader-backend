@@ -7,12 +7,9 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from app.dependencies import get_db
 from app.schemas.auth import Auth
 from app.services import auth_serivce
+from app.core.security import bcrypt_context, oauth2_bearer
 
 router = APIRouter(prefix="/auth",tags=["auth"])
-
-bcrypt_context=CryptContext(schemes=['bcrypt'],deprecated='auto')
-
-oauth2_bearer= OAuth2PasswordBearer(tokenUrl='auth/token')
 
 @router.post("/token",response_model=Auth)
 async def login_access_token(data:Annotated[OAuth2PasswordRequestForm,Depends()] ,db: Session = Depends(get_db)):
