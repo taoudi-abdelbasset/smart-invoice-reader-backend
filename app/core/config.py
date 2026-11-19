@@ -12,6 +12,8 @@ DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./app.db")
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
 
+LITELLM_MASTER_KEY = os.getenv("LITELLM_MASTER_KEY")
+
 UPLOAD_DIR = "uploads"
 
 ALLOWED_IMAGE_TYPES = {
