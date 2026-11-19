@@ -18,10 +18,11 @@ def authenticate_user(username: str,password: str,db):
 def create_access_token(username: str,user_id: UUID,expired_at: timedelta):
     encode={
         "sub":username,
-        "id":str(user_id)
+        "id":str(user_id),
+        "exp":datetime.utcnow() + expired_at
     }
-    expires=datetime.utcnow() + expired_at
-    encode.update({"exp":expires})
+    # expires=datetime.utcnow() + expired_at
+    # encode.update({"exp":expires})
     return jwt.encode(encode,SECRET_KEY,algorithm=ALGORITHM)
 
 async def get_current_user(token: Annotated[str,Depends(oauth2_bearer)]):
