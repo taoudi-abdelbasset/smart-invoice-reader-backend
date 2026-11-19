@@ -2,6 +2,7 @@ import shutil
 import uuid
 from pathlib import Path
 from uuid import UUID
+from sqlalchemy.orm import Session
 
 from fastapi import UploadFile, HTTPException,status
 
@@ -38,4 +39,11 @@ def save_file(upload: UploadFile, user_id: UUID, conversation_id: UUID):
         conversation_id=conversation_id,
         file_name=original_name,
         file_path=str(dest),
+    )
+
+def get_unproccessed_files(db: Session, session_id: UUID):
+    return (
+        db.query(File)
+        .filter(File.is_proccesed == False,File.conversation_id == str(session_id))
+        .order_by(File.created_at.desc())
     )
