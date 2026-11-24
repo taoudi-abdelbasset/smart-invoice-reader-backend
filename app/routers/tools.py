@@ -17,22 +17,3 @@ def list_tools(db: Session = Depends(get_db), user: User = Depends(get_current_u
 @router.get("/{tool_id}", response_model=ToolsOut)
 def get_tool(tool_id: UUID, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     return tools_service.get_tool(db, tool_id)
-
-@router.post("/", response_model=ToolsOut, status_code=status.HTTP_201_CREATED)
-def create_tool(data: ToolsCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    return tools_service.create_tool(db, user.id, data)
-
-@router.patch("/{tool_id}", response_model=ToolsOut)
-def update_tool(
-    tool_id: UUID,
-    data: ToolsUpdate,
-    db: Session = Depends(get_db),
-    user: User = Depends(get_current_user),
-):
-    tool = tools_service.get_tool(db, tool_id)
-    return tools_service.update_tool(db, tool, data)
-
-@router.delete("/{tool_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_tool(tool_id: UUID, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    tool = tools_service.get_tool(db, tool_id)
-    tools_service.delete_tool(db, tool)
