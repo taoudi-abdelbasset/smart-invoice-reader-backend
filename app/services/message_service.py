@@ -16,15 +16,11 @@ def create_message(db: Session, conversation_id: UUID, content: str, role: Messa
 def list_messages(db: Session, conversation_id: UUID):
     return (
         db.query(Message)
-        .filter(Message.conversation_id == conversation_id)
-        .order_by(Message.created_at.desc())
+        .filter(Message.conversation_id == conversation_id, Message.deleted_at.is_(None))
+        .order_by(Message.created_at.asc())
         .all()
     )
 
 
 def get_message(db: Session, message_id: UUID):
-    return (
-        db.query(Message)
-        .get(message_id)
-        .first()
-    )
+    return db.get(Message, message_id)
