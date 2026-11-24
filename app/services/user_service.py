@@ -3,13 +3,20 @@ from app.models.user import User
 from app.schemas.user import UserCreate
 from app.auth import auth
 
+from fastapi import HTTPException, status
+from sqlalchemy.exc import IntegrityError
+
 def create_user(db: Session, user: UserCreate):
     db_user = User(
         username=user.username,
-        hashed_password=auth.bcrypt_context.hash(user.password)
+        hashed_password=auth.bcrypt_context.hash(user.password),
     )
     db.add(db_user)
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(status.HTTP_409_CONFLICT, "Username already taken.")
     db.refresh(db_user)
     return db_user
 
