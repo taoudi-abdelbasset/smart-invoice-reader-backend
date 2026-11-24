@@ -29,7 +29,6 @@ def get_agent(agent_mate_id: UUID, db: Session = Depends(get_db), user_id: UUID 
 
 @router.post("/", response_model=MateAgentOut, status_code=status.HTTP_201_CREATED)
 def create_agent(data: MateAgentCreate, db: Session = Depends(get_db), user_id: UUID = Depends(auth_serivce.current_user_id)):
-    print("\n\n\n\t\t\t >>> ", user_id)
     return agent_service.create_agent(db, user_id, data)
 
 @router.patch("/{agent_mate_id}", response_model=MateAgentOut)
