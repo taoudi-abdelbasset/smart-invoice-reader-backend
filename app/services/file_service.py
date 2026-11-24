@@ -41,9 +41,14 @@ def save_file(upload: UploadFile, user_id: UUID, conversation_id: UUID):
         file_path=str(dest),
     )
 
-def get_unproccessed_files(db: Session, session_id: UUID):
+def get_unproccessed_files(db: Session, session_id: UUID) -> list[File]:
     return (
         db.query(File)
-        .filter(File.is_proccesed == False,File.conversation_id == str(session_id))
+        .filter(
+            File.is_proccesed.is_(False),
+            File.conversation_id == session_id,
+            File.deleted_at.is_(None),
+        )
         .order_by(File.created_at.desc())
+        .all()
     )
