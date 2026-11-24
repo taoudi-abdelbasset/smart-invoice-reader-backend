@@ -4,6 +4,7 @@ from app.db.database import Base
 from sqlalchemy import Column, Uuid, String, DateTime, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
+from datetime import datetime, timezone
 
 class MessageRole(str, EnumClass):
     user = "user"
@@ -19,7 +20,7 @@ class Message(Base):
 
     role = Column(Enum(MessageRole), nullable=False)
     
-    created_at= Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     deleted_at= Column(DateTime(timezone=True))
 
     conversation = relationship("Conversation", back_populates="messages")
