@@ -5,7 +5,7 @@ load_dotenv()
 
 DEFAULT_MODEL = os.getenv("DEFAULT_MODEL")
 
-ALLOW_ORIGINS = os.getenv("ALLOW_ORIGINS")
+ALLOW_ORIGINS = [o.strip() for o in os.getenv("ALLOW_ORIGINS", "").split(",") if o.strip()]
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./app.db")
 
