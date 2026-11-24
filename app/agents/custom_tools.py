@@ -196,27 +196,21 @@ class InvoiceTools(
             self.db.rollback()
             return json.dumps({"error": str(e)})
 
-    def list_unprocessed_files(
-        self,
-        session_id: str | None = None,
-    )-> str:
+    def list_unprocessed_files(self) -> str:
         """
-        List the Unprocessed files of the conversation. Call it once per request, only after
-        the user confirmed the extracted data. Leave unknown fields empty or null, never guess.
-
-        Args:
-            session_id: Is the ID of the current conversation
-
-        Returns:
-            JSON with the saved invoice id, or an error message.
+        List the files uploaded in this conversation that were not processed yet.
+        Returns a JSON list with id, file_name and created_at for each file.
+        Use the id as file_id when calling save_invoice.
         """
         try:
-            files_list = file_service.get_unproccessed_files(
-                self.db,
-                self.session_id,
-            )
-            return json.dumps(files_list)
-        except HTTPException as e:
-            return json.dumps({"error": e.detail})
-        except ValueError as e:
-            return json.dumps({"error": str(e)})
+            files = file_service.get_unproccessed_files(self.db, self.session_id)
+            return json.dumps([
+                {
+                    "id": str(f.id),
+                    "file_name": f.file_name,
+                    "created_at": _format_date(f.created_at),
+                }
+                for f in files
+            ])
+        except (HTTPException, ValueError) as e:
+            return json.dumps({"error": getattr(e, "detail", str(e))})
