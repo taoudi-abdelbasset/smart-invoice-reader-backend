@@ -6,6 +6,7 @@ from sqlalchemy.sql import func
 from app.models.mate_agent import MateAgent
 from app.models.tools import Tools, AgentTools
 from app.schemas.agent import MateAgentCreate, MateAgentUpdate
+from app.models.user import User
 
 def _agent_query(db: Session):
     return db.query(MateAgent).options(
@@ -56,9 +57,12 @@ def get_owned_agent(db: Session, agent_mate_id: UUID, user_id: UUID) -> MateAgen
     return agent
 
 def create_agent(db: Session, user_id: UUID, data: MateAgentCreate) -> MateAgent:
-    exists = db.query(MateAgent).filter(MateAgent.agent_id == data.agent_id).first()
-    if exists:
+    if db.query(MateAgent).filter(func.lower(MateAgent.agent_id) == data.agent_id.lower()).first():
         raise HTTPException(status.HTTP_409_CONFLICT, f"Agent id '{data.agent_id}' is already used.")
+
+    # @tags must be unambiguous: an agent id can't equal a username
+    if db.query(User).filter(func.lower(User.username) == data.agent_id.lower()).first():
+        raise HTTPException(status.HTTP_409_CONFLICT, "That id is already used by a username.")
 
     agent = MateAgent(**data.model_dump(), user_id=user_id)
     db.add(agent)

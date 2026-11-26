@@ -20,6 +20,9 @@ from app.models import business_entity as business_entity_model  # noqa: F401
 from app.models import contact as contact_model  # noqa: F401
 from app.models import mate_agent as agent_mate_model # noqa: F401
 from app.models import tools as agent_tools_model # noqa: F401
+from app.models import conversation_member as conversation_member_model  # noqa: F401
+from app.models import agent_task as agent_task_model  # noqa: F401
+from app.services import tools_service, broker
 
 from app.routers import files, user, conversation, message, invoice, agent, tools
 from app.auth import auth
@@ -30,6 +33,7 @@ from app.db.database import Base, engine
 async def lifespan(app: FastAPI):
     with SessionLocal() as db:
         tools_service.sync_registry_to_db(db)
+        broker.recover(db)
     yield
 
 app = FastAPI(lifespan=lifespan)

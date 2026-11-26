@@ -16,7 +16,7 @@ async def login_access_token(data:Annotated[OAuth2PasswordRequestForm,Depends()]
     user = auth_serivce.authenticate_user(data.username,data.password,db)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail='Could Not validate user')
-    token = auth_serivce.create_access_token(user.username,user.id,timedelta(minutes=15))
+    token = auth_serivce.create_access_token(user.username,user.id,timedelta(hours=8))
     return {'access_token':token,"token_type":"bearer"}
 
 @router.get("/")

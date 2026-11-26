@@ -22,4 +22,4 @@ async def upload_new_file(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found")
 
     file = file_service.save_file(upload, user_id, conversation_id)
-    return await conversation_service.append_file(db, conversation, file)
+    return conversation_service.append_file(db, conversation, file, user_id)

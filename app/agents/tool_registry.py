@@ -6,7 +6,8 @@ class RegisteredToolkit(Toolkit):
     tool_key: str | None = None
 
     def __init_subclass__(cls, key: str | None = None, name: str | None = None,
-                          desc: str | None = None, **kwargs):
+                          desc: str | None = None, public_safe: bool = False,
+                          requires_approval: bool = False, **kwargs):
         super().__init_subclass__(**kwargs)
         if key is None:
             return
@@ -17,4 +18,6 @@ class RegisteredToolkit(Toolkit):
             "cls": cls,
             "name": name or key,
             "desc": desc or (cls.__doc__ or "").strip(),
+            "public_safe": public_safe,
+            "requires_approval": requires_approval,
         }

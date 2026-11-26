@@ -6,7 +6,15 @@ from app.auth import auth
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 
+from fastapi import HTTPException, status
+from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
+from app.models.mate_agent import MateAgent
+
 def create_user(db: Session, user: UserCreate):
+    if db.query(MateAgent).filter(func.lower(MateAgent.agent_id) == user.username.lower()).first():
+        raise HTTPException(status.HTTP_409_CONFLICT, "Username already taken.")
+
     db_user = User(
         username=user.username,
         hashed_password=auth.bcrypt_context.hash(user.password),

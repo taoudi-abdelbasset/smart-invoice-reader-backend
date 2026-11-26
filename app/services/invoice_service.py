@@ -17,6 +17,7 @@ from sqlalchemy.orm import contains_eager
 from sqlalchemy import func
 from app.models.contact import CompanyContact, EntityContact, ContactType
 from app.schemas.invoice_tool import BusinessEntityInput
+from app.models.conversation_member import ConversationMember
 
 
 def _add_missing_contacts(parent, contact_cls, contacts):
@@ -76,11 +77,11 @@ def _load_options():
 def create_invoice(db: Session, user_id: UUID, session_id: UUID, file_id: UUID, data: InvoiceCreate):
     file = (
         db.query(File)
-        .join(Conversation, File.conversation_id == Conversation.session_id)
+        .join(ConversationMember, ConversationMember.conversation_id == File.conversation_id)
         .filter(
             File.id == file_id,
             File.conversation_id == session_id,
-            Conversation.user_id == user_id,
+            ConversationMember.user_id == user_id,
             File.deleted_at.is_(None),
             File.is_proccesed.is_(False),
         )

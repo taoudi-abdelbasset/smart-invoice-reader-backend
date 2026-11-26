@@ -52,12 +52,14 @@ def delete_tool(db: Session, tool: Tools) -> None:
     db.commit()
 
 def sync_registry_to_db(db: Session) -> None:
-    """Insert every TOOL_REGISTRY entry missing from the Tools table."""
     existing = {t.key: t for t in db.query(Tools).all()}
-
     for key, meta in TOOL_REGISTRY.items():
-        if key not in existing:
-            db.add(Tools(key=key, name=meta["name"], desc=meta["desc"]))
-        # already there (even soft-deleted): leave it alone, so manual edits/deletes are respected
-
+        tool = existing.get(key)
+        if tool is None:
+            db.add(Tools(key=key, name=meta["name"], desc=meta["desc"],
+                         public_safe=meta["public_safe"],
+                         requires_approval=meta["requires_approval"]))
+        else:
+            tool.public_safe = meta["public_safe"]
+            tool.requires_approval = meta["requires_approval"]
     db.commit()

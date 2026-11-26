@@ -16,6 +16,9 @@ class Tools(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     deleted_at = Column(DateTime(timezone=True))
 
+    public_safe = Column(Boolean, nullable=False, default=False)
+    requires_approval = Column(Boolean, nullable=False, default=False)
+
     agent_tool = relationship("AgentTools", back_populates="tool")
 
 

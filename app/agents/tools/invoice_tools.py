@@ -42,6 +42,7 @@ class InvoiceTools(
     key="invoice_tools",
     name="Invoice tools",
     desc="List, search and save invoices extracted from uploaded files.",
+    public_safe=True,
 ):
     def __init__(self, db: Session, user_id: UUID, session_id: UUID, **kwargs):
         self.db = db
